@@ -1,76 +1,57 @@
-import heapq
-
-class Node:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.g = float('inf')  # Cost from start node to current node
-        self.h = 0              # Heuristic estimate from current node to goal node
-        self.parent = None      # Parent node in the path
-
-    def f(self):
-        return self.g + self.h
-
-class AStar:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.grid = [[0 for _ in range(width)] for _ in range(height)]
-
-    def is_valid(self, x, y):
-        return 0 <= x < self.width and 0 <= y < self.height and self.grid[y][x] != 1
-
-    def reconstruct_path(self, current_node):
-        path = []
-        while current_node is not None:
-            path.append((current_node.x, current_node.y))
-            current_node = current_node.parent
-        return path[::-1]
-
-    def find_path(self, start, goal):
-        open_set = []
-        heapq.heappush(open_set, (0, start))
-        start.g = 0
-        start.h = self.heuristic(start, goal)
-
-        while open_set:
-            _, current = heapq.heappop(open_set)
-
-            if current == goal:
-                return self.reconstruct_path(current)
-
-            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:  # 4-connected grid
-                next_x, next_y = current.x + dx, current.y + dy
-                if self.is_valid(next_x, next_y):
-                    next_node = Node(next_x, next_y)
-                    next_node.g = current.g + 1  # Assuming uniform cost
-                    next_node.h = self.heuristic(next_node, goal)
-                    next_node.parent = current
-
-                    heapq.heappush(open_set, (next_node.f(), next_node))
-
-        return None  # No path found
-
-    def heuristic(self, a, b):
-        return abs(a.x - b.x) + abs(a.y - b.y)
-
-# Example usage with user input
-width = int(input("Enter width of the grid: "))
-height = int(input("Enter height of the grid: "))
-
-astar = AStar(width, height)
-
-start_x = int(input("Enter start X coordinate: "))
-start_y = int(input("Enter start Y coordinate: "))
-start_node = Node(start_x, start_y)
-
-goal_x = int(input("Enter goal X coordinate: "))
-goal_y = int(input("Enter goal Y coordinate: "))
-goal_node = Node(goal_x, goal_y)
-
-path = astar.find_path(start_node, goal_node)
-
-if path:
-    print("Path found:", path)
+def aStarAlgo(start_node, stop_node):
+graph_nodes = {
+'A': [('B', 2), ('E', 3)],
+'B': [('C', 1), ('G', 9)],
+'C': None,
+'E': [('D', 6)],
+'D': [('G', 1)],
+'G':None
+}
+heuristic_dist = {
+'A': 11,
+'B': 6,
+'C': 99,
+'D': 1,
+'E': 7,
+'G': 0,
+}
+open_set = set([start_node])
+closed_set = set()
+g = {start_node: 0}
+parents = {start_node: start_node}
+while open_set:
+n = min(open_set, key=lambda x: g[x] + heuristic_dist.get(x, float('inf')))
+if n == stop_node or graph_nodes[n] is None:
+break
+for m, weight in get_neighbors(n, graph_nodes):
+if m not in open_set and m not in closed_set:
+open_set.add(m)
+parents[m] = n
+g[m] = g[n] + weightelse:
+if g[m] > g[n] + weight:
+g[m] = g[n] + weight
+parents[m] = n
+if m in closed_set:
+closed_set.remove(m)
+open_set.add(m)
+open_set.remove(n)
+closed_set.add(n)
+if stop_node not in parents:
+print('Path does not exist!')
+return None
+path = []
+current_node = stop_node
+while current_node != start_node:
+if v in graph_nodes:
+return graph_nodes[v]
 else:
-    print("No path found.")
+return []
+start_node_input = input("Enter start node: ").upper()
+stop_node_input = input("Enter stop node: ").upper()
+path.append(current_node)
+current_node = parents[current_node]
+path.append(start_node)
+path.reverse()
+print('Path found:', path)
+return path
+def get_neighbors(v, graph_nodes):
