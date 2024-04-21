@@ -1,0 +1,76 @@
+import heapq
+
+class Node:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.g = float('inf')  # Cost from start node to current node
+        self.h = 0              # Heuristic estimate from current node to goal node
+        self.parent = None      # Parent node in the path
+
+    def f(self):
+        return self.g + self.h
+
+class AStar:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.grid = [[0 for _ in range(width)] for _ in range(height)]
+
+    def is_valid(self, x, y):
+        return 0 <= x < self.width and 0 <= y < self.height and self.grid[y][x] != 1
+
+    def reconstruct_path(self, current_node):
+        path = []
+        while current_node is not None:
+            path.append((current_node.x, current_node.y))
+            current_node = current_node.parent
+        return path[::-1]
+
+    def find_path(self, start, goal):
+        open_set = []
+        heapq.heappush(open_set, (0, start))
+        start.g = 0
+        start.h = self.heuristic(start, goal)
+
+        while open_set:
+            _, current = heapq.heappop(open_set)
+
+            if current == goal:
+                return self.reconstruct_path(current)
+
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:  # 4-connected grid
+                next_x, next_y = current.x + dx, current.y + dy
+                if self.is_valid(next_x, next_y):
+                    next_node = Node(next_x, next_y)
+                    next_node.g = current.g + 1  # Assuming uniform cost
+                    next_node.h = self.heuristic(next_node, goal)
+                    next_node.parent = current
+
+                    heapq.heappush(open_set, (next_node.f(), next_node))
+
+        return None  # No path found
+
+    def heuristic(self, a, b):
+        return abs(a.x - b.x) + abs(a.y - b.y)
+
+# Example usage with user input
+width = int(input("Enter width of the grid: "))
+height = int(input("Enter height of the grid: "))
+
+astar = AStar(width, height)
+
+start_x = int(input("Enter start X coordinate: "))
+start_y = int(input("Enter start Y coordinate: "))
+start_node = Node(start_x, start_y)
+
+goal_x = int(input("Enter goal X coordinate: "))
+goal_y = int(input("Enter goal Y coordinate: "))
+goal_node = Node(goal_x, goal_y)
+
+path = astar.find_path(start_node, goal_node)
+
+if path:
+    print("Path found:", path)
+else:
+    print("No path found.")
