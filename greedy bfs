@@ -1,0 +1,40 @@
+#BEST FIRST SEARCH GREEDY (BFS)
+import heapq
+
+class Graph:
+    def _init_(self):
+        self.graph = {}
+
+    def add_edge(self, u, v, weight):
+        if u not in self.graph:
+            self.graph[u] = []
+        self.graph[u].append((v, weight))
+
+    def best_first_search(self, start, goal):
+        visited = set()
+        pq = [(0, start)]
+        while pq:
+            cost, node = heapq.heappop(pq)
+            print(node, end=' ')
+            if node == goal:
+                return  # Goal found
+            visited.add(node)
+            if node in self.graph:
+                for neighbor, weight in self.graph[node]:
+                    if neighbor not in visited:
+                        heapq.heappush(pq, (weight, neighbor))
+
+if _name_ == "_main_":
+    graph = Graph()
+
+    num_edges = int(input("Enter the number of edges: "))
+
+    for _ in range(num_edges):
+        u, v, weight = map(int, input("Enter edge (u, v) and weight: ").split())
+        graph.add_edge(u, v, weight)
+
+    start_node = int(input("Enter the starting node for Best-First Search: "))
+    goal_node = int(input("Enter the goal node: "))
+
+    print("Best-First Search Traversal:")
+    graph.best_first_search(start_node, goal_node)
