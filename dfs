@@ -1,36 +1,27 @@
-#DFS(DEPTH FIRST SEARCH)
-class Graph:
-    def _init_(self):
-        self.graph = {}
-
-    def add_edge(self, u, v):
-        if u not in self.graph:
-            self.graph[u] = []
-        self.graph[u].append(v)
-
-    def dfs_util(self, node, visited):
-        visited.add(node)
-        print(node, end=' ')
-
-        if node in self.graph:
-            for neighbor in self.graph[node]:
-                if neighbor not in visited:
-                    self.dfs_util(neighbor, visited)
-
-    def dfs(self, start):
+def dfs(graph, start, visited=None):
+    if visited is None:
         visited = set()
-        self.dfs_util(start, visited)
+    visited.add(start)
+    print(start, end=" ")
 
-if _name_ == "_main_":
-    graph = Graph()
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            dfs(graph, neighbor, visited)
 
-    num_edges = int(input("Enter the number of edges: "))
+# Taking input from user to create the graph
+def create_graph():
+    graph = {}
+    vertices = int(input("Enter the number of vertices: "))
 
-    for _ in range(num_edges):
-        u, v = map(int, input("Enter edge (u, v): ").split())
-        graph.add_edge(u, v)
+    for _ in range(vertices):
+        vertex = input("Enter vertex: ")
+        neighbors = input(f"Enter neighbors of vertex {vertex} separated by space: ").split()
+        graph[vertex] = neighbors
 
-    start_node = int(input("Enter the starting node for DFS: "))
+    return graph
 
+if name == "main":
+    graph = create_graph()
+    start_vertex = input("Enter the start vertex for DFS: ")
     print("DFS Traversal:")
-    graph.dfs(start_node)
+    dfs(graph, start_vertex)
